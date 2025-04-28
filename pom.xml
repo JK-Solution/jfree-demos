@@ -47,7 +47,6 @@
             <artifactId>jfreechart</artifactId>
             <version>1.5.5</version>
         </dependency>
-        
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>org.jfree.chart3d</artifactId>

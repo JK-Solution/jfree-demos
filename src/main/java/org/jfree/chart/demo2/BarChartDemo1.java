@@ -37,9 +37,14 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.axis.ValueAxis;
+import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.CenterTextMode;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.RingPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.chart.ui.ApplicationFrame;
@@ -59,6 +64,8 @@ import org.jfree.data.xy.XYSeriesCollection;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -79,7 +86,7 @@ public class BarChartDemo1 extends ApplicationFrame {
      */
     public static void main(String[] args) {
         BarChartDemo1 demo = new BarChartDemo1("图表");
-        ChartPanel chartPanel = new ChartPanel(demo.getPieChart());
+        ChartPanel chartPanel = new ChartPanel(demo.getBasicBarChart());
         chartPanel.setPreferredSize(new Dimension(1000, 600));
 
         JFrame frame = new JFrame();
@@ -105,7 +112,7 @@ public class BarChartDemo1 extends ApplicationFrame {
         // JFreeChart chart = getBoxAndWhiskerChart();
 
         // 柱状图，折线图，堆叠柱状图chart创建
-        // JFreeChart chart = getBasicBarChart();
+        JFreeChart chart = getBasicBarChart();
 
         // 带误差的柱状图
         // JFreeChart chart = getIntervalChart();
@@ -120,7 +127,10 @@ public class BarChartDemo1 extends ApplicationFrame {
         // JFreeChart chart = getTimeSeriesChart();
         
         // 饼图
-        JFreeChart chart = getPieChart();
+        // JFreeChart chart = getPieChart();
+
+        // 环形图
+        // JFreeChart chart = getRingChart();
         
         ChartPanel chartPanel = new ChartPanel(chart, false);
         chartPanel.setFillZoomRectangle(true);
@@ -134,13 +144,71 @@ public class BarChartDemo1 extends ApplicationFrame {
 
     private JFreeChart getPieChart() {
         DefaultPieDataset dataset = new DefaultPieDataset();
-        dataset.setValue("C++", 20);
-        dataset.setValue("Java", 40);
-        dataset.setValue("Python", 30);
+        dataset.setValue("待审核", 20);
+        dataset.setValue("未开始", 64);
+        dataset.setValue("已完成", 19);
+        dataset.setValue("执行中", 0);
+        dataset.setValue("未反馈", 64);
+        
 
-        JFreeChart chart = ChartFactory.createPieChart(
-            "编程语言占比", dataset, true, true, false
+        JFreeChart chart = ChartFactory.createRingChart(
+            "MID整体OPL任务分布", dataset, true, true, false
         );
+
+
+            // 配置环形图
+            RingPlot plot = (RingPlot) chart.getPlot();
+            plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+                "{1}", NumberFormat.getNumberInstance(), new DecimalFormat("0")
+            ));
+            plot.setSectionDepth(0.55);
+            plot.setInnerSeparatorExtension(0);
+            plot.setOuterSeparatorExtension(0);
+            
+            plot.setCenterTextMode(CenterTextMode.FIXED);
+            // 设置中心文字属性
+            // plot.setCenterText("28\\u000aOP");
+            // plot.setCenterTextFont(new Font("宋体", Font.BOLD, 20)); 
+            // plot.setCenterTextColor(Color.RED);
+            // plot.setBackgroundPaint(null);
+            plot.setCenterTextMode(CenterTextMode.FIXED);
+            plot.setCenterText(
+                "<html>" +
+                "<div style='text-align: center; font-family: 宋体;'>" +
+                "<span style='font-size:24px;'>28</span><br/>" +
+                "<span style='font-size:16px;'>OPL总数</span>" +
+                "</div>" +
+                "</html>"
+            );
+            plot.setCenterTextFont(new Font("宋体", Font.PLAIN, 1)); // 占位字体（实际由 HTML 控制）
+            // plot.setCenterTextAnchor(TextBlockAnchor.CENTER);
+            plot.setBackgroundPaint(null);
+        return chart;
+    }
+
+    private JFreeChart getRingChart() {
+        DefaultPieDataset dataset = new DefaultPieDataset();
+        dataset.setValue("待审核", 20);
+        dataset.setValue("未开始", 0);
+        dataset.setValue("已完成", 19);
+        dataset.setValue("执行中", 48);
+        dataset.setValue("未反馈", 0);
+        
+
+        JFreeChart chart = ChartFactory.createRingChart(
+            "MID整体OPL任务分布", dataset, true, true, false
+        );
+          // 配置环形图
+        RingPlot plot = (RingPlot) chart.getPlot();
+        plot.setIgnoreZeroValues(true);
+        plot.setSectionPaint("TypeA", new Color(255, 99, 132));
+        plot.setSectionPaint("TypeB", new Color(54, 162, 235));
+        plot.setSectionPaint("TypeC", new Color(255, 206, 86));
+        plot.setLabelGenerator(new StandardPieSectionLabelGenerator(
+            "{0}: {1}", NumberFormat.getNumberInstance(), new DecimalFormat("0")
+        ));
+        plot.setSectionDepth(0.5);
+
         return chart;
     }
 
@@ -217,22 +285,29 @@ public class BarChartDemo1 extends ApplicationFrame {
     private JFreeChart getBasicBarChart() {
         // 数据准备
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(200, "产品A", "Q1");
-        dataset.addValue(300, "产品A", "Q2");
+        dataset.addValue(2, "产品A", "Q1");
+        dataset.addValue(3, "产品A", "Q2");
 
-        dataset.addValue(500, "产品B", "Q1");
-        dataset.addValue(600, "产品B", "Q2");
+        dataset.addValue(5, "产品B", "Q1");
+        dataset.addValue(6, "产品B", "Q2");
 
         // 生成柱状图图表
-        // JFreeChart chart = ChartFactory.createBarChart(
-        //     "季度销量", "季度", "销量", dataset
-        // );
+        JFreeChart chart = ChartFactory.createBarChart(
+            "季度销量", "季度", "销量", dataset
+        );
         
         // 生成折线图
         // JFreeChart chart = ChartFactory.createLineChart("季度销量", "季度", "销量", dataset);
 
          // 生成堆叠柱状图
-         JFreeChart chart = ChartFactory.createStackedBarChart("季度销量", "季度", "销量", dataset);
+        //  JFreeChart chart = ChartFactory.createStackedBarChart("季度销量", "季度", "销量", dataset);
+
+        CategoryPlot plot = chart.getCategoryPlot();
+        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+        yAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        // yAxis.setTickUnit(new NumberTickUnit(1));
+
+
         return chart;
     }
 
